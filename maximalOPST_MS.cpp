@@ -61,19 +61,20 @@ std::string get_grandparent_directory(const std::string& path) {
 
 
 
-// 输入: suffix tree built from input_vecA (假设为P)，以及 input_vecB (作为T)
-// 输出: vector<int> ms_table，其中 ms[i] 是从 T[i..] 与 P 的最长匹配长度
+// input: suffix tree built from input_vecA, input_vecB oracle
+// output: vector<int> ms_table, ms[i]: the longest length of  T[i..] could match with P
 
 void compute_matching_statistics(OPST_MS& OP, oracle &B_oracle, vector<int> &ms_table) {
     auto root = OP.root;
-    stNode* v = root;      // 当前匹配的节点
-    int matched = 0;             // 当前匹配的长度
-
+    stNode* v = root;
+    int matched = 0;
     int i = 0;
     while (i < ms_table.size()) {
         stNode* u = v;
 
-        // 从当前节点继续匹配 T[i + l..] 对应 P 中的路径
+
+        int distance_below_u = 0;
+
         while (i +  matched < ms_table.size()) {
             int j = 0;
             int next_char = B_oracle.LastCodeInt(i , i + matched);
@@ -81,7 +82,7 @@ void compute_matching_statistics(OPST_MS& OP, oracle &B_oracle, vector<int> &ms_
             if (!child) break;
             j++; // the match of length is at least 1
 
-            // 当前边的长度 = child->depth - u->depth
+            // current length of edge = child->depth - u->depth
             int edge_len = child->depth - u->depth;
 
 
@@ -100,8 +101,11 @@ void compute_matching_statistics(OPST_MS& OP, oracle &B_oracle, vector<int> &ms_
 
             matched += j;
 
-            if (j < edge_len) break;  // 匹配未走完整条边，终止
-            u = child; // 边匹配完，进入 child 节点
+            if (j < edge_len) {
+                distance_below_u = matched - u->depth;
+                break;  // cannot match the whole edge
+            }
+            u = child; // match the whole edge，u -> child
         }
 
         ms_table[i] = matched;
@@ -112,7 +116,8 @@ void compute_matching_statistics(OPST_MS& OP, oracle &B_oracle, vector<int> &ms_
             matched = 0;
         } else if (u->slink) {
             v = u->slink;
-            matched = matched - 1;
+            matched = matched - 1 - distance_below_u;
+            assert(matched >= 0);
         } else {
             while (u->slink == NULL){
                 u = u->parent;

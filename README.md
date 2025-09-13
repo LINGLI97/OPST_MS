@@ -7,7 +7,7 @@ It provides algorithms for constructing OPST, mining maximal and closed patterns
 
 ## Directory Structure
 
-.
+.  
 ├── OPST_construction.cpp         # OPST construction  
 ├── OPST_MP.cpp                   # OPST + maximal pattern mining  
 ├── OPST_CP.cpp                   # OPST + closed pattern mining  

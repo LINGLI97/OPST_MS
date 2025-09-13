@@ -167,9 +167,11 @@ pair<int, int> OPST_MS:: LastCode(int a , int b){
 
             this->waveletTime = std::chrono::duration_cast < std::chrono::milliseconds > (wavelet_end - wavelet_start).count()*0.001;
             waveletFlag = true;
-            cout<<"It is necessary to construct the wavelet tree for b-a > "<< rangeThreshold<<endl;
-            cout<<"sigma of input = "<<wt.sigma<<endl;
-            cout<< "Runtime for wavelet tree construction  = "<<waveletTime<<" s."<<endl;
+//            cout<<"It is necessary to construct the wavelet tree for b-a > "<< rangeThreshold<<endl;
+//            cout<<"sigma of input = "<<wt.sigma<<endl;
+//            cout<< "Runtime for wavelet tree construction  = "<<waveletTime<<" s."<<endl;
+//            cout<<"OPST_MS"<<endl;
+
         }
 
 
@@ -205,7 +207,7 @@ int OPST_MS::LastCodeInt(int a, int b) {
     if (b != n){
         pair<int, int> ab = this->LastCode(a, b);
 //        cout<<ab.first <<", "<<ab.second<<endl;
-        cout<<"OPST: ("<<a<<","<<b<<"): "<<ab.first <<","<<ab.second<<"; LastInt: "<<ab.first * 2 + ab.second<<endl;
+//        cout<<"OPST: ("<<a<<","<<b<<"): "<<ab.first <<","<<ab.second<<"; LastInt: "<<ab.first * 2 + ab.second<<endl;
 
         return (ab.first * 2 + ab.second);
 
@@ -336,24 +338,17 @@ void OPST_MS::ComputeSuffixLinkBP( stNode * u )
     stNode * u_copy = u;
 
     //count the num of implicit node between two branching nodes
-
-
     vector<stNode *> sd_label_up;
     vector<stNode *> sd_label_down;
 
     sd_label_up.push_back(u_copy);
 
     while (!u_copy->parent->slink){
-
         u_copy = u_copy->parent;
         sd_label_up.push_back(u_copy);
-
-//        explicit_k ++;
-        // count the explicit nodes we traverse
     }
 
     stNode * nanc_u = u_copy->parent;
-    stNode * u_down = u_copy->parent;
     sd_label_up.push_back(nanc_u);
 
     stNode * v = nanc_u->slink;
@@ -363,7 +358,6 @@ void OPST_MS::ComputeSuffixLinkBP( stNode * u )
     {
         // go down
         cnt ++;
-//        cout<<"v->depth: "<<v->depth<<endl;
 
         v = v->getChild( LastCodeInt(u->start+1, u->start + v->depth + 1) );
         if (cnt % 2 == 0 && v->depth < d - 1){
@@ -384,48 +378,24 @@ void OPST_MS::ComputeSuffixLinkBP( stNode * u )
     int index_down = 0 ;
     if((!sd_label_down.empty()) && (!sd_label_down.empty())){
 
-//        for (auto i : sd_label_down){
-//            cout<<i->depth<<" "<<endl;
-//        }
-//
-//        cout<<"-------------"<<endl;
-//        for (auto i : sd_label_up){
-//            cout<<i->depth<<" "<<endl;
-//        }
-
         for (int index_up = sd_label_up.size() -1 ; index_up > -1 ; ){
 
-//            cout<<"index_up: "<<index_up<<"; index_down: "<<index_down<<"sd_label_up.size():" <<sd_label_up.size()<<"sd_label_down.size(): "<<sd_label_down.size()<<endl;
 
             if (sd_label_up[index_up]->depth > sd_label_down[index_down]->depth + 1){
 //create node and build suffix link from the newly created nodes
-//                cout<<"1"<<sd_label_up[index_up]<<", "<<sd_label_down[index_down]->depth + 1<<endl;
                 stNode* back_propagated = createNode(sd_label_up[index_up], sd_label_down[index_down]->depth + 1);
-//                cout<<"1-2"<<endl;
-
                 back_propagated->slink = sd_label_down[index_down];
-//                cout<<"1-3"<<endl;
-
                 index_down ++;
-//                cout<<"create node and build suffix link from the newly created nodes; "<<"index_up: "<<index_up<<"; index_down: "<<index_down<<"; Depth: "<<sd_label_up[index_up]->depth<<"; "<<sd_label_down[index_down]->depth + 1<<endl;
 
             }else if (sd_label_up[index_up]->depth < sd_label_down[index_down]->depth + 1){
                 //skip the current node on the left.
-//                cout<<"2"<<endl;
-
                 index_up --;
-//                cout<<"skip the current node on the left; "<<"index_up: "<<index_up<<"; index_down: "<<index_down<<"; Depth: "<<sd_label_up[index_up]->depth<<"; "<<sd_label_down[index_down]->depth + 1<<endl;
 
             }else{
-//                cout<<"3"<<endl;
-
                 //build suffix link from the existing node on the left
                 sd_label_up[index_up]->slink = sd_label_down[index_down];
                 index_up --;
                 index_down ++;
-//                cout<<"build suffix link from the existing node on the left; "<<"index_up: "<<index_up<<"; index_down: "<<index_down<<"; Depth: "<<sd_label_up[index_up]->depth<<"; "<<sd_label_down[index_down]->depth + 1<<endl;
-
-
             }
 
             if (index_down >= sd_label_down.size()){

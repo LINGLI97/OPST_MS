@@ -164,9 +164,10 @@ pair<int, int> oracle::LastCode(int a , int b){
 
             this->waveletTime = std::chrono::duration_cast < std::chrono::milliseconds > (wavelet_end - wavelet_start).count()*0.001;
             waveletFlag = true;
-            cout<<"It is necessary to construct the wavelet tree for b-a > "<< rangeThreshold<<endl;
-            cout<<"sigma of input = "<<wt.sigma<<endl;
-            cout<< "Runtime for wavelet tree construction  = "<<waveletTime<<" s."<<endl;
+//            cout<<"It is necessary to construct the wavelet tree for b-a > "<< rangeThreshold<<endl;
+//            cout<<"sigma of input = "<<wt.sigma<<endl;
+//            cout<< "Runtime for wavelet tree construction  = "<<waveletTime<<" s."<<endl;
+//            cout<<"oracle"<<endl;
         }
 
 
@@ -201,7 +202,7 @@ int oracle::LastCodeInt(int a, int b) {
     // b = n, returns terminate_label: 2 * n + 1
     if (b != n){
         pair<int, int> ab = this->LastCode(a, b);
-        cout<<"Oracle of B("<<a<<","<<b<<"): "<<ab.first <<","<<ab.second<<"; LastInt: "<<ab.first * 2 + ab.second<<endl;
+//        cout<<"Oracle of B("<<a<<","<<b<<"): "<<ab.first <<","<<ab.second<<"; LastInt: "<<ab.first * 2 + ab.second<<endl;
 
         return (ab.first * 2 + ab.second);
 

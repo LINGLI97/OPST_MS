@@ -8,27 +8,27 @@ It provides algorithms for constructing OPST, mining maximal and closed patterns
 ## Directory Structure
 
 .
-├── OPST_construction.cpp         # OPST construction 
-├── OPST_MP.cpp                   # OPST + maximal pattern mining 
-├── OPST_CP.cpp                   # OPST + closed pattern mining 
-├── OPST_MS_SuffixLink.cpp        # OPST + matching statistics (with suffix links)
-├── OPST_MS_Root.cpp              # OPST + matching statistics (without suffix links)
-├── BA_MP.cpp                     # Baseline for maximal pattern mining
-├── BA_CP.cpp                     # Baseline for closed pattern mining
-├── node.cpp / node.h             # Node structure
-├── OPST.cpp / OPST.h             # Core OPST implementation
-├── OPST_MS.cpp / OPST_MS.h       # OPST + matching statistics
-├── baseline.cpp / baseline.h     # Baseline implementations
-├── oracle.cpp / oracle.h         # Oracle data structure
-├── DerivedWTInt.cpp / .h         # Wavelet tree based integer support
-├── utils.cpp / utils.hpp         # Utility functions
-├── malloc.h                      # Memory statistics (uses mallinfo/mallinfo2)
-├── inputW.txt                    # Example input text W
-├── inputP.txt                    # Example input text P
-├── Makefile                      # Build configuration
-├── pre-install.sh                # Installation script for dependencies
-├── sdslite.zip                   # SDSL library (compressed)
-├── README.md                     # (this file)
+├── OPST_construction.cpp         # OPST construction  
+├── OPST_MP.cpp                   # OPST + maximal pattern mining  
+├── OPST_CP.cpp                   # OPST + closed pattern mining  
+├── OPST_MS_SuffixLink.cpp        # OPST + matching statistics (with suffix links)  
+├── OPST_MS_Root.cpp              # OPST + matching statistics (without suffix links)  
+├── BA_MP.cpp                     # Baseline for maximal pattern mining  
+├── BA_CP.cpp                     # Baseline for closed pattern mining  
+├── node.cpp / node.h             # Node structure  
+├── OPST.cpp / OPST.h             # Core OPST implementation  
+├── OPST_MS.cpp / OPST_MS.h       # OPST + matching statistics  
+├── baseline.cpp / baseline.h     # Baseline implementations  
+├── oracle.cpp / oracle.h         # Oracle data structure  
+├── DerivedWTInt.cpp / .h         # Wavelet tree based integer support  
+├── utils.cpp / utils.hpp         # Utility functions  
+├── malloc.h                      # Memory statistics (uses mallinfo/mallinfo2)  
+├── inputW.txt                    # Example input text W  
+├── inputP.txt                    # Example input text P  
+├── Makefile                      # Build configuration  
+├── pre-install.sh                # Installation script for dependencies  
+├── sdslite.zip                   # SDSL library (compressed)  
+├── README.md                     # (this file) 
 
 ## Dependencies
 

@@ -8,9 +8,9 @@ It provides algorithms for constructing OPST, mining maximal and closed patterns
 ## Directory Structure
 
 .
-├── OPST_construction.cpp         # OPST construction
-├── OPST_MP.cpp                   # OPST + maximal pattern mining
-├── OPST_CP.cpp                   # OPST + closed pattern mining
+├── OPST_construction.cpp         # OPST construction 
+├── OPST_MP.cpp                   # OPST + maximal pattern mining 
+├── OPST_CP.cpp                   # OPST + closed pattern mining 
 ├── OPST_MS_SuffixLink.cpp        # OPST + matching statistics (with suffix links)
 ├── OPST_MS_Root.cpp              # OPST + matching statistics (without suffix links)
 ├── BA_MP.cpp                     # Baseline for maximal pattern mining
@@ -87,7 +87,7 @@ make clean
 ```
 
 ### Options
-```bash
+```text
 -f    path to the input file
 -t    minimal support (tau > 1)
 -w    input text W for matching statistics

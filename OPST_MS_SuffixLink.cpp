@@ -158,6 +158,16 @@ void compute_matching_statistics(OPST_MS& OP, oracle &B_oracle, vector<int> &ms_
     for (int i = 0; i < ms_table.size(); ++i) {
 
         stNode* match_node = curr_node;
+
+// going down to ms_table[i-1] - 1
+        stNode* prev_node = match_node;
+        while(i>0 and match_node != nullptr and match_node->depth <= ms_table[i-1] -1){
+            prev_node = match_node;
+            match_node = match_node->getChild(B_oracle.LastCodeInt(i, i + match_node->depth));
+
+        }
+        match_len = prev_node->depth;
+        match_node = prev_node;
         while (i + match_len < ms_table.size()) {
             int edge_pos = 0;
             int b_char = B_oracle.LastCodeInt(i, i + match_node->depth);
@@ -236,6 +246,63 @@ void compute_matching_statistics(OPST_MS& OP, oracle &B_oracle, vector<int> &ms_
 
 
 }
+
+
+
+//void compute_matching_statistics(OPST_MS& OP, oracle &B_oracle, vector<int> &ms_table) {
+//    stNode* u = OP.root;
+//    int ell = 0;  // 当前匹配长度
+//
+//    int m = static_cast<int>(ms_table.size());
+//
+//    for (int i = 0; i < m; i++) {
+//        // --- while i+ell < m ---
+//        while (i + ell < m) {
+//            // 取当前边
+//            int code = B_oracle.LastCodeInt(i, i + u->depth);
+//            stNode* u_next = u->getChild(code);
+//            if (!u_next) break; // 没有子节点
+//
+//            // 沿着这条边比对
+//            bool mismatch = false;
+//            while (ell < u_next->depth && i + ell < m) {
+//                int P_char = B_oracle.LastCodeInt(i, i + ell);
+//                int T_char = OP.LastCodeInt(u_next->start, u_next->start + ell);
+//                if (P_char != T_char) {
+//                    mismatch = true;
+//                    break;
+//                }
+//                ell++;
+//            }
+//
+//            if (mismatch || ell < u_next->depth) {
+//                // 在边上停了（发生 mismatch 或中途停）
+//                break;
+//            }
+//
+//            // 整条边匹配，下降
+//            u = u_next;
+//        }
+//
+//        ms_table[i] = ell; // 存储匹配长度
+//
+//        // === 沿 suffix link 回溯 ===
+//        while (u->slink == nullptr) {
+//            if (u == OP.root) break; // 防止 root->parent
+//            u = u->parent;
+//        }
+//        if (u->slink) {
+//            u = u->slink;
+//            ell = std::max(u->depth - 1, 0);
+//        } else {
+//            // 回到 root
+//            u = OP.root;
+//            ell = 0;
+//        }
+//    }
+//}
+
+
 
 
 
@@ -586,7 +653,7 @@ int main(int argc, char *argv[])
 
     cout<<"--------------------------------------------Information Board--------------------------------------------------------"<<endl;
 
-    cout<<"Enabling OPST maximal method"<<endl;
+//    cout<<"Enabling OPST maximal method"<<endl;
 
     cout<< "Comparing "<<filenameW<<" and "<<filenameP<<endl;
 
@@ -653,7 +720,10 @@ int main(int argc, char *argv[])
     cout<<"Total time for MS construction of our method (starting from suffix link)= "<<MS_Construction1 + time_Construction<<" s."<<endl;
 
     cout<<"Index memory of counting: "<< memory_Index / (1024.0 * 1024.0)<<"MB"<<endl;
-
+//    for (auto i : MS_table){
+//        cout<<i<<" ";
+//    }
+//    cout<<endl;
 //
 //    // clustering part
 //

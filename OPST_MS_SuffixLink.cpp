@@ -150,271 +150,50 @@ std::string get_grandparent_directory(const std::string& path) {
 
 
 
-void compute_matching_statistics(OPST_MS& OP, oracle &B_oracle, vector<int> &ms_table) {
-    stNode* curr_node = OP.root;
-    int match_len = 0;
-    bool remaining = false;
 
-    for (int i = 0; i < ms_table.size(); ++i) {
+void compute_matching_statistics(OPST_MS& OP, oracle &P_oracle, std::vector<int> &ms_table) {
+    stNode* u = OP.root;     // (u, ℓ) ← (root, 0)
+    int l = 0;
+    const int m = static_cast<int>(ms_table.size());
 
-        stNode* match_node = curr_node;
+    for (int i = 0; i < m; ++i) {                           // for i in [0..m-1] [L2]
+        while (i + l < m) {
+            int c = P_oracle.LastCodeInt(i, i + u->depth);  // p[i + Depth(u)]
+            stNode* up = u->getChild(c);
+            if (up == nullptr) break;
 
-// going down to ms_table[i-1] - 1
-        stNode* prev_node = match_node;
-        while(i>0 and match_node != nullptr and match_node->depth <= ms_table[i-1] -1){
-            prev_node = match_node;
-            match_node = match_node->getChild(B_oracle.LastCodeInt(i, i + match_node->depth));
 
-        }
-        match_len = prev_node->depth;
-        match_node = prev_node;
-        while (i + match_len < ms_table.size()) {
-            int edge_pos = 0;
-            int b_char = B_oracle.LastCodeInt(i, i + match_node->depth);
-            stNode* next_node = match_node->getChild(b_char);
-            if (!next_node) break;
-            if (remaining){
-                edge_pos = match_len - match_node->depth;;
-            } else{
-                edge_pos++;
-                match_len++;
+            while (l < up->depth && i + l < m) {
+                // p 的当前字符：p[i + l]
+                int pc = P_oracle.LastCodeInt(i, i + l);
+                int tc = OP.LastCodeInt(up->start, up->start + l);
+                if (pc != tc) break;
+                ++l;
             }
 
-
-            int edge_len = next_node->depth - match_node->depth;
-            while (edge_pos < edge_len && i + match_len < ms_table.size()) {
-                int P_char = B_oracle.LastCodeInt(i, i + match_len);
-                int T_char = OP.LastCodeInt(next_node->start, next_node->start + match_len);
-                if (T_char != P_char) break;
-                edge_pos++;
-                match_len++;
-            }
-
-
-            if (edge_pos < edge_len) {
-                remaining = true;
+            if (l < up->depth) {
                 break;
             }
-            match_node = next_node;
-            remaining = false;
-        }
-        ms_table[i] = match_len;
 
-        if (match_len == 0 || match_node == OP.root) {
-            curr_node = OP.root;
-            match_len = 0;
-            remaining = false;
-        } else if (match_node->slink) {
-            curr_node = match_node->slink;
-            match_len--;
-
-            if (match_len > curr_node->depth) {
-                int b_char = B_oracle.LastCodeInt(i + 1, i + 1 + curr_node->depth);
-                stNode* reposition_node = curr_node->getChild(b_char);
-                stNode* prev_node = curr_node;
-
-                while (match_len > reposition_node->depth) {
-                    b_char = B_oracle.LastCodeInt(
-                            i + 1,
-                            i + 1 + reposition_node->depth);
-                    prev_node = reposition_node;
-                    reposition_node = reposition_node->getChild(b_char);
-                }
-
-                if (match_len == reposition_node->depth) {
-                    curr_node = reposition_node;
-                } else{
-                    curr_node = prev_node;
-                }
-
-            }
-
-        } else {
-            while (match_node->slink == NULL){
-                match_node = match_node->parent;
-            }
-            curr_node = match_node->slink;
-            match_len = curr_node->depth;
-            remaining = false;
+            u = up;
         }
 
+        ms_table[i] = l;
 
+        while (u->slink == nullptr) {
+            u = u->parent;
+        }
 
-
+        // (u, ℓ) ← (SufLink(u), max{ℓ-1, 0})
+        u = u->slink;
+        l = (l > 0 ? l - 1 : 0);
     }
-
-
-
 }
 
 
 
-//void compute_matching_statistics(OPST_MS& OP, oracle &B_oracle, vector<int> &ms_table) {
-//    stNode* u = OP.root;
-//    int ell = 0;  // 当前匹配长度
-//
-//    int m = static_cast<int>(ms_table.size());
-//
-//    for (int i = 0; i < m; i++) {
-//        // --- while i+ell < m ---
-//        while (i + ell < m) {
-//            // 取当前边
-//            int code = B_oracle.LastCodeInt(i, i + u->depth);
-//            stNode* u_next = u->getChild(code);
-//            if (!u_next) break; // 没有子节点
-//
-//            // 沿着这条边比对
-//            bool mismatch = false;
-//            while (ell < u_next->depth && i + ell < m) {
-//                int P_char = B_oracle.LastCodeInt(i, i + ell);
-//                int T_char = OP.LastCodeInt(u_next->start, u_next->start + ell);
-//                if (P_char != T_char) {
-//                    mismatch = true;
-//                    break;
-//                }
-//                ell++;
-//            }
-//
-//            if (mismatch || ell < u_next->depth) {
-//                // 在边上停了（发生 mismatch 或中途停）
-//                break;
-//            }
-//
-//            // 整条边匹配，下降
-//            u = u_next;
-//        }
-//
-//        ms_table[i] = ell; // 存储匹配长度
-//
-//        // === 沿 suffix link 回溯 ===
-//        while (u->slink == nullptr) {
-//            if (u == OP.root) break; // 防止 root->parent
-//            u = u->parent;
-//        }
-//        if (u->slink) {
-//            u = u->slink;
-//            ell = std::max(u->depth - 1, 0);
-//        } else {
-//            // 回到 root
-//            u = OP.root;
-//            ell = 0;
-//        }
-//    }
-//}
 
 
-
-
-
-
-
-
-
-// input: suffix tree built from input_vecA, input_vecB oracle
-// output: vector<int> ms_table, ms[i]: the longest length of  T[i..] could match with P
-
-//void compute_matching_statistics(OPST_MS& OP, oracle &B_oracle, vector<int> &ms_table) {
-//    auto root = OP.root;
-//    stNode* v = root;
-//    int matched = 0;
-//    int i = 0;
-//    int distance_below_u = 0;
-//    bool is_below = false;
-//    while (i < ms_table.size()) {
-//
-//
-//        auto MS_start = std::chrono::high_resolution_clock::now();
-//
-//        stNode* u = v;
-//
-//        while (i +  matched < ms_table.size() ) {
-//
-//            stNode* child = NULL;
-//            int j = 0;
-//
-//            if (is_below) {
-//                j = distance_below_u;
-//                int next_char = B_oracle.LastCodeInt(i , i + matched - distance_below_u);
-//                child = u->getChild(next_char);
-//                if (!child) break;
-//
-//            }else{
-//
-//                int next_char = B_oracle.LastCodeInt(i , i + matched);
-//                child = u->getChild(next_char);
-//                if (!child) break;
-//                j++; // the match of length is at least 1
-//                matched ++;
-//            }
-//
-//
-//            // current length of edge = child->depth - u->depth
-//            int edge_len = child->depth - u->depth;
-//
-//            while (j < edge_len && i + matched < ms_table.size() ) {
-//
-//                int T_char = B_oracle.LastCodeInt(i, i +  matched );
-//                int P_char = OP.LastCodeInt(child->start , child->start + matched);
-//
-//                if (T_char != P_char) break;
-//                j++;
-//                matched ++;
-//            }
-//
-//
-//            if (j < edge_len) {
-//                distance_below_u = matched - u->depth;
-//                is_below = true;
-//                break;  // cannot match the whole edge
-//            }
-//            u = child; // match the whole edge，u -> child
-//            is_below = false;
-//            distance_below_u = 0;
-//
-//        }
-//        auto MS_mid= std::chrono::high_resolution_clock::now();
-//
-//        ms_table[i] = matched;
-//
-//        if (matched == 0 || u == root) {
-//            v = root;
-//            matched = 0;
-//            is_below = false;
-//            distance_below_u = 0;
-//        } else if (u->slink) {
-//            v = u->slink;
-//            matched = matched - 1 ;
-//            if (matched> v->depth) {
-//
-//                int next_char = B_oracle.LastCodeInt(i + 1, i + 1 + matched - distance_below_u);
-//                stNode *child_tmp = v->getChild(next_char);
-//
-//                stNode *prevchild = NULL;
-//                while (distance_below_u > child_tmp->depth - v->depth) {
-//                    next_char = B_oracle.LastCodeInt(i + 1,
-//                                                     i + 1 + matched - distance_below_u + child_tmp->depth - v->depth);
-//                    prevchild = child_tmp;
-//                    child_tmp = child_tmp->getChild(next_char);
-//                }
-//                if (prevchild) {
-//                    v = prevchild;
-//                    distance_below_u = matched - v->depth;
-//                }
-//            }
-//        } else {
-//            while (u->slink == NULL){
-//                u = u->parent;
-//            }
-//            v = u->slink;
-//            matched = v->depth;
-//
-//            is_below = false;
-//            distance_below_u = 0;
-//        }
-//        i++;
-//    }
-//}
-//
 
 
 
@@ -719,7 +498,7 @@ int main(int argc, char *argv[])
     cout<<"Runtime for only MS construction of our method (starting from suffix link)= "<<MS_Construction1<<" s."<<endl;
     cout<<"Total time for MS construction of our method (starting from suffix link)= "<<MS_Construction1 + time_Construction<<" s."<<endl;
 
-    cout<<"Index memory of counting: "<< memory_Index / (1024.0 * 1024.0)<<"MB"<<endl;
+//    cout<<"Index memory of counting: "<< memory_Index / (1024.0 * 1024.0)<<"MB"<<endl;
 //    for (auto i : MS_table){
 //        cout<<i<<" ";
 //    }
